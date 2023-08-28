@@ -82,13 +82,12 @@ const sketch = ({ context, canvas }) => {
   scene.add(bgMesh);
 
   
-  let isRotating = false;
+
   let isAnimating = false;
 
   function animateCube(rotationAmount, zoomAmount) {
     if (isAnimating) return;
     isAnimating = true;
-    isRotating = true;
 
     const animationDuration = 1000; // Duration of animation in milliseconds
     const startTime = Date.now();
@@ -110,15 +109,7 @@ const sketch = ({ context, canvas }) => {
           progress
         );
       });
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        isAnimating = false;
-  
-        // Reset the flags
-        isRotating = false;
-        // ... (remaining code)
-      }
+
       camera.position.z = THREE.MathUtils.lerp(startZoom, targetZoom, progress);
 
       // Adjust the background mesh position
@@ -261,22 +252,7 @@ const sketch = ({ context, canvas }) => {
     const yAxis = new THREE.Vector3(0, 1, 0);
     const rotateX = (deltaTime / ROTATE_TIME) * Math.PI * 2;
     const rotateY = (deltaTime / ROTATE_TIME) * Math.PI * 2;
-    if (isRotating) {
-      // Apply the spin rotation
-      meshes.forEach((mesh) => {
-        mesh.rotation.y += deltaTime * 0.5; // Adjust the rotation speed as needed
-      });
-    } else {
-      // Calculate the rotation angles based on the mouse position
-      const maxRotation = Math.PI / 4; // Maximum rotation angle in radians
-      const rotationX = maxRotation * mouse.y;
-      const rotationY = maxRotation * mouse.x;
-  
-      // Apply the calculated rotations to the cube
-      meshes[0].rotation.x = rotationX;
-      meshes[0].rotation.y = rotationY;
-    } 
-    
+
 
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
