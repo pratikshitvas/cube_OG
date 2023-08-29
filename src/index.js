@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 3.5);
+  camera.position.set(0, 0, 1);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -79,6 +79,7 @@ const sketch = ({ context, canvas }) => {
   const bgMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
   const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
   bgMesh.position.set(0, 0, -23);
+  // bgMesh.position.set(0, 0, -8);
   scene.add(bgMesh);
  
   let isAnimating = false;
@@ -90,7 +91,7 @@ const sketch = ({ context, canvas }) => {
     if (isShrinking) return;
     isShrinking = true;
 
-    const animationDuration = 500;
+    const animationDuration = 1000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 0.5;
@@ -101,8 +102,10 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
+      const rotation = progress * Math.PI * 1; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
+        mesh.rotation.y = rotation;
       });
 
       if (progress < 1) {
@@ -120,7 +123,7 @@ const sketch = ({ context, canvas }) => {
     if (isExpanding) return;
     isExpanding = true;
 
-    const animationDuration = 500;
+    const animationDuration = 1000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
@@ -131,8 +134,10 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
+      const rotation = progress * Math.PI * 1; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
+        mesh.rotation.y = rotation;
       });
 
       if (progress < 1) {
