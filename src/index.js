@@ -63,7 +63,7 @@ const sketch = ({ context, canvas }) => {
   // Content
   // -------
   const video = document.createElement("video");
-  video.src = "src/ecloset_video.mp4";
+  video.src = "";
   video.loop = true;
   video.muted = true;
   video.play();
@@ -80,60 +80,65 @@ const sketch = ({ context, canvas }) => {
   const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
   bgMesh.position.set(0, 0, -23);
   scene.add(bgMesh);
-
-  
-
+ 
   let isAnimating = false;
 
-  function animateCube(rotationAmount, zoomAmount) {
-    if (isAnimating) return;
-    isAnimating = true;
+  let isShrinking = false;
+  let isExpanding = false;
 
-    const animationDuration = 1000; // Duration of animation in milliseconds
+  function animateShrink() {
+    if (isShrinking) return;
+    isShrinking = true;
+
+    const animationDuration = 1000;
     const startTime = Date.now();
-    const startRotationY = meshes[0].rotation.y;
-    const startZoom = camera.position.z;
-    const targetRotationY = startRotationY + rotationAmount;
-    const targetZoom = startZoom + zoomAmount;
-    const initialBgMeshPositionZ = bgMesh.position.z;
-    const targetBgMeshPositionZ = initialBgMeshPositionZ + zoomAmount; // Adjust as needed
+    const startScale = meshes[0].scale.x;
+    const targetScale = 0.5;
+
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
 
+      const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
       meshes.forEach((mesh) => {
-        mesh.rotation.y = THREE.MathUtils.lerp(
-          startRotationY,
-          targetRotationY,
-          progress
-        );
+        mesh.scale.set(scale, scale, scale);
       });
-
-      camera.position.z = THREE.MathUtils.lerp(startZoom, targetZoom, progress);
-
-      // Adjust the background mesh position
-      bgMesh.position.z = THREE.MathUtils.lerp(
-        initialBgMeshPositionZ,
-        targetBgMeshPositionZ,
-        progress
-      );
-
-      // Adjust the scale of the background mesh to simulate zooming
-      const bgMeshScale = THREE.MathUtils.lerp(1, 3, progress); // Adjust the scale factor as needed
-      bgMesh.scale.set(bgMeshScale, bgMeshScale, 1);
-
-      // Adjust the scale of the video texture
-
-      camera.lookAt(scene.position);
 
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        isAnimating = false;
+        isShrinking = false;
+        animateExpand();
+      }
+    }
 
-        // Reset the video texture and background mesh to their initial values
-        bgMesh.position.z = initialBgMeshPositionZ;
+    animate();
+  }
+
+  function animateExpand() {
+    if (isExpanding) return;
+    isExpanding = true;
+
+    const animationDuration = 1000;
+    const startTime = Date.now();
+    const startScale = meshes[0].scale.x;
+    const targetScale = 1;
+
+    function animate() {
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / animationDuration, 1);
+
+      const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
+      meshes.forEach((mesh) => {
+        mesh.scale.set(scale, scale, scale);
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        isExpanding = false;
       }
     }
 
@@ -165,10 +170,11 @@ const sketch = ({ context, canvas }) => {
     button.style.background = "rgba(255, 255, 255, 0.5)";
     button.style.cursor = "pointer";
     button.addEventListener("click", () => {
-      animateCube(rotationAmount, zoomAmount);
+      if (!isShrinking && !isExpanding) {
+        animateShrink();
+      }
     });
-
-    return button;
+        return button;
   }
 
   function rotateCube(amount) {
@@ -181,7 +187,7 @@ const sketch = ({ context, canvas }) => {
 
   const positions = [[0, 0, 0]];
 
-  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.2)];
+  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.2 )];
 
   const hdrEquirect = new THREE.RGBELoader().load(
     "src/empty_warehouse_01_2k.hdr",
