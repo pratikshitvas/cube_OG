@@ -90,7 +90,7 @@ const sketch = ({ context, canvas }) => {
     if (isShrinking) return;
     isShrinking = true;
 
-    const animationDuration = 1000;
+    const animationDuration = 500;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 0.5;
@@ -120,7 +120,7 @@ const sketch = ({ context, canvas }) => {
     if (isExpanding) return;
     isExpanding = true;
 
-    const animationDuration = 1000;
+    const animationDuration = 500;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
