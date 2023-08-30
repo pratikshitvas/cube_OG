@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 0.5);
+  camera.position.set(0, 0, 3);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -63,7 +63,7 @@ const sketch = ({ context, canvas }) => {
   // Content
   // -------
   const video = document.createElement("video");
-  video.src = "";
+  video.src = "src/ecloset_video.mp4";
   video.loop = true;
   video.muted = true;
   video.play();
@@ -86,6 +86,8 @@ const sketch = ({ context, canvas }) => {
 
   let isShrinking = false;
   let isExpanding = false;
+  let isStarted = false;
+
 
   function animateShrink() {
     if (isShrinking) return;
@@ -94,7 +96,7 @@ const sketch = ({ context, canvas }) => {
     const animationDuration = 1200;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
-    const targetScale = 0.17;
+    const targetScale = 1;
 
     function animate() {
       const currentTime = Date.now();
@@ -102,7 +104,7 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1.25; 
+      const rotation = progress * Math.PI * 1; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
@@ -123,10 +125,10 @@ const sketch = ({ context, canvas }) => {
     if (isExpanding) return;
     isExpanding = true;
 
-    const animationDuration = 1500;
+    const animationDuration = 2000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
-    const targetScale = 1;
+    const targetScale = 7;
 
     function animate() {
       const currentTime = Date.now();
@@ -134,7 +136,7 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1.25; 
+      const rotation = progress * Math.PI * 1; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
@@ -149,6 +151,61 @@ const sketch = ({ context, canvas }) => {
 
     animate();
   }
+  const startButton = createStartButton("Start");
+  document.body.appendChild(startButton); // Add the button to the DOM
+
+  // ... (rest of the code)
+
+  function createStartButton(text) {
+    const button = document.createElement("button");
+    button.textContent = text;
+    button.style.fontSize = "24px";
+    button.style.padding = "5px 10px";
+    button.style.margin = "5px";
+    button.style.border = "none";
+    button.style.background = "rgba(255, 255, 255, 0.5)";
+    button.style.cursor = "pointer";
+    button.style.position = "absolute"; // Position the button absolutely
+    button.style.top = "20px";
+    button.style.left = "120px"; // Adjust the position as needed
+    button.addEventListener("click", () => {
+      if (!isStarted) {
+        expandCubeWithSpin();
+        button.style.display = "none"; // Hide the button after clicking
+        isStarted = true;
+      }
+    });
+
+    return button;
+  }
+
+  function expandCubeWithSpin() {
+    const initialScale = meshes[0].scale.clone();
+    const targetScale = new THREE.Vector3(6,6,6); // Adjust as needed
+    const rotationAmount = Math.PI / 0.5; // Adjust the rotation amount
+    const animationDuration = 4500; // Duration of animation in milliseconds
+
+    const startTime = Date.now();
+    const initialRotation = meshes[0].rotation.y;
+
+    function animate() {
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / animationDuration, 1);
+
+      const easedProgress = 1 - Math.pow(1 - progress, 3); // Apply easing for smoother animation
+
+      meshes[0].scale.lerpVectors(initialScale, targetScale, easedProgress);
+      meshes[0].rotation.y = initialRotation + rotationAmount * easedProgress;
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    animate();
+  }
+
 
   const leftButton = createArrowButton("←", -3, 3);
   const rightButton = createArrowButton("→", 3, -3);
