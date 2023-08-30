@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 3);
+  camera.position.set(0, 0, 5);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -109,7 +109,7 @@ const sketch = ({ context, canvas }) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
       });
-      bgMesh.scale.set(scale, scale, 1);
+      bgMesh.scale.set(scale, scale, 0.5);
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
@@ -128,7 +128,7 @@ const sketch = ({ context, canvas }) => {
     const animationDuration = 2000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
-    const targetScale = 7;
+    const targetScale = 5;
 
     function animate() {
       const currentTime = Date.now();
@@ -141,7 +141,7 @@ const sketch = ({ context, canvas }) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
       });
-      bgMesh.scale.set(scale, scale, 1);
+      bgMesh.scale.set(scale, scale, 0.5);
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
