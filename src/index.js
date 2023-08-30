@@ -109,7 +109,7 @@ const sketch = ({ context, canvas }) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
       });
-
+      bgMesh.scale.set(scale, scale, 1);
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
@@ -141,7 +141,7 @@ const sketch = ({ context, canvas }) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
       });
-
+      bgMesh.scale.set(scale, scale, 1);
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
