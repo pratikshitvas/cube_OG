@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 1);
+  camera.position.set(0, 0, 0.5);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -91,10 +91,10 @@ const sketch = ({ context, canvas }) => {
     if (isShrinking) return;
     isShrinking = true;
 
-    const animationDuration = 1000;
+    const animationDuration = 1200;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
-    const targetScale = 0.5;
+    const targetScale = 0.17;
 
     function animate() {
       const currentTime = Date.now();
@@ -102,7 +102,7 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1; 
+      const rotation = progress * Math.PI * 1.25; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
@@ -123,7 +123,7 @@ const sketch = ({ context, canvas }) => {
     if (isExpanding) return;
     isExpanding = true;
 
-    const animationDuration = 1000;
+    const animationDuration = 1500;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
@@ -134,7 +134,7 @@ const sketch = ({ context, canvas }) => {
       const progress = Math.min(elapsed / animationDuration, 1);
 
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1; 
+      const rotation = progress * Math.PI * 1.25; 
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotation;
