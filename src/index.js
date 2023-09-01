@@ -93,13 +93,14 @@ const sketch = ({ context, canvas }) => {
     if (isShrinking) return;
     isShrinking = true;
   
-    const animationDuration = 1500;
+    const animationDuration = 700;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
     const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
     const targetRotationX = Math.PI * 0.1; // Target X-axis rotation
   
+    // z to X for the multi diretion cube rotation
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
