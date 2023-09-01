@@ -29,9 +29,9 @@ const sketch = ({ context, canvas }) => {
     enableSwoopingCamera: false,
     enableRotation: true,
     transmission: 1,
-    thickness: 1.5,
-    roughness: 0.07,
-    envMapIntensity: 1.5
+    thickness: 0.5,
+    roughness: 0,
+    envMapIntensity: 0
   };
   const mouse = new THREE.Vector2();
   canvas.addEventListener('mousemove', (event) => {
@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 5);
+  camera.position.set(0, 0, 2.70);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -63,7 +63,7 @@ const sketch = ({ context, canvas }) => {
   // Content
   // -------
   const video = document.createElement("video");
-  video.src = "src/ecloset_video.mp4";
+  video.src = "";
   video.loop = true;
   video.muted = true;
   video.play();
@@ -78,7 +78,7 @@ const sketch = ({ context, canvas }) => {
   const bgGeometry = new THREE.PlaneGeometry(5, 5);
   const bgMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
   const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-  bgMesh.position.set(0, 0, -23);
+  bgMesh.position.set(0, 0, -8);
   // bgMesh.position.set(0, 0, -8);
   scene.add(bgMesh);
  
@@ -92,24 +92,30 @@ const sketch = ({ context, canvas }) => {
   function animateShrink() {
     if (isShrinking) return;
     isShrinking = true;
-
-    const animationDuration = 1200;
+  
+    const animationDuration = 1500;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
-
+    const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
+    const targetRotationX = Math.PI * 0.1; // Target X-axis rotation
+  
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-
+  
       const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1; 
+      const rotationY = progress * Math.PI * 1;
+      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, progress); // Update X-axis rotation
+  
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
-        mesh.rotation.y = rotation;
+        mesh.rotation.y = rotationY;
+        mesh.rotation.z = rotationX; // Apply X-axis rotation
       });
-      bgMesh.scale.set(scale, scale, 0.5);
+      bgMesh.scale.set(scale, scale, 0);
+  
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
@@ -117,45 +123,65 @@ const sketch = ({ context, canvas }) => {
         animateExpand();
       }
     }
-
+  
     animate();
   }
+  
 
-  function animateExpand() {
-    if (isExpanding) return;
-    isExpanding = true;
+  
+function animateExpand() {
+  if (isExpanding) return;
+  isExpanding = true;
 
-    const animationDuration = 2000;
-    const startTime = Date.now();
-    const startScale = meshes[0].scale.x;
-    const targetScale = 5;
+  const animationDuration = 1000;
+  const startTime = Date.now();
+  const startScale = meshes[0].scale.x;
+  const targetScale = 5;
+  const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
+  const targetRotationX = Math.PI * 0.5; // Target X-axis rotation
 
-    function animate() {
-      const currentTime = Date.now();
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / animationDuration, 1);
+  function animate() {
+    const currentTime = Date.now();
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / animationDuration, 1);
 
-      const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-      const rotation = progress * Math.PI * 1; 
-      meshes.forEach((mesh) => {
-        mesh.scale.set(scale, scale, scale);
-        mesh.rotation.y = rotation;
-      });
-      bgMesh.scale.set(scale, scale, 0.5);
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        isExpanding = false;
-      }
+    const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
+    const rotationY = progress * Math.PI * 1;
+    const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, progress); // Update X-axis rotation
+
+    meshes.forEach((mesh) => {
+      mesh.scale.set(scale, scale, scale);
+      mesh.rotation.y = rotationY;
+      mesh.rotation.z = rotationX; // Apply X-axis rotation
+    });
+    bgMesh.scale.set(scale, scale, 0);
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      isExpanding = false;
     }
-
-    animate();
   }
+
+  animate();
+}
+  const arrowButtonStyle = document.createElement("style");
+arrowButtonStyle.textContent = `
+  .arrow-button {
+    display: none;
+  }
+`;
+document.head.appendChild(arrowButtonStyle);
   const startButton = createStartButton("Start");
   document.body.appendChild(startButton); // Add the button to the DOM
 
   // ... (rest of the code)
-
+  function toggleArrowButtonsVisibility(show) {
+    const arrowButtons = document.querySelectorAll(".arrow-button");
+    arrowButtons.forEach((button) => {
+      button.style.display = show ? "block" : "none";
+    });
+  }
   function createStartButton(text) {
     const button = document.createElement("button");
     button.textContent = text;
@@ -171,38 +197,43 @@ const sketch = ({ context, canvas }) => {
     button.addEventListener("click", () => {
       if (!isStarted) {
         expandCubeWithSpin();
-        button.style.display = "none"; // Hide the button after clicking
+        toggleArrowButtonsVisibility(true); // Show arrow buttons
+        button.style.display = "none"; // Hide the "Start" button after clicking
         isStarted = true;
       }
     });
-
+  
     return button;
   }
-
+  
   function expandCubeWithSpin() {
     const initialScale = meshes[0].scale.clone();
-    const targetScale = new THREE.Vector3(6,6,6); // Adjust as needed
+    const targetScale = new THREE.Vector3(5, 5, 5); // Adjust as needed
     const rotationAmount = Math.PI / 0.5; // Adjust the rotation amount
-    const animationDuration = 4500; // Duration of animation in milliseconds
-
+    const videoInitialScale = bgMesh.scale.clone();
+    const videoTargetScale = new THREE.Vector3(2,2,1); // Adjust as needed
+    const animationDuration = 3500; // Duration of animation in milliseconds
+  
     const startTime = Date.now();
     const initialRotation = meshes[0].rotation.y;
-
+  
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-
+  
       const easedProgress = 1 - Math.pow(1 - progress, 3); // Apply easing for smoother animation
-
+  
       meshes[0].scale.lerpVectors(initialScale, targetScale, easedProgress);
       meshes[0].rotation.y = initialRotation + rotationAmount * easedProgress;
-
+  
+      bgMesh.scale.lerpVectors(videoInitialScale, videoTargetScale, easedProgress);
+  
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
     }
-
+  
     animate();
   }
 
@@ -224,6 +255,7 @@ const sketch = ({ context, canvas }) => {
 
   function createArrowButton(text, rotationAmount, zoomAmount) {
     const button = document.createElement("button");
+    button.className = "arrow-button";
     button.textContent = text;
     button.style.fontSize = "24px";
     button.style.padding = "5px 10px";
@@ -249,7 +281,7 @@ const sketch = ({ context, canvas }) => {
 
   const positions = [[0, 0, 0]];
 
-  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.2 )];
+  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.1 )];
 
   const hdrEquirect = new THREE.RGBELoader().load(
     "src/empty_warehouse_01_2k.hdr",
