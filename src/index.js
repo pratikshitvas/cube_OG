@@ -134,10 +134,18 @@ const sketch = ({ context, canvas }) => {
     if (isExpanding) return;
     isExpanding = true;
   
-    const animationDuration = 1500;
+    const animationDuration = 2000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 5;
+  
+    // Keep track of the current rotation state from the last animation
+    const startRotationY = meshes[0].rotation.y;
+    const startRotationX = meshes[0].rotation.x;
+  
+    // Calculate the target rotation state for the expansion
+    const targetRotationY = startRotationY + Math.PI * 1; // For example, rotate by 90 degrees
+    const targetRotationX = startRotationX + Math.PI * 0.1; // Adjust the X-axis rotation as needed
   
     function animate() {
       const currentTime = Date.now();
@@ -149,8 +157,14 @@ const sketch = ({ context, canvas }) => {
   
       const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
   
+      // Interpolate rotation values for smooth rotation
+      const rotationY = THREE.MathUtils.lerp(startRotationY, targetRotationY, easedProgress);
+      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, easedProgress);
+  
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
+        mesh.rotation.y = rotationY;
+        mesh.rotation.x = rotationX; // Apply X-axis rotation
       });
       bgMesh.scale.set(scale, scale, 0);
   
@@ -163,6 +177,7 @@ const sketch = ({ context, canvas }) => {
   
     animate();
   }
+  
   
   const arrowButtonStyle = document.createElement("style");
 arrowButtonStyle.textContent = `
