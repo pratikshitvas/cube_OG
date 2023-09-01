@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 2.70);
+  camera.position.set(0, 0.7, 2.70);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -78,7 +78,7 @@ const sketch = ({ context, canvas }) => {
   const bgGeometry = new THREE.PlaneGeometry(5, 5);
   const bgMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
   const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-  bgMesh.position.set(0, 0, -8);
+  bgMesh.position.set(0, -3, -10);
   // bgMesh.position.set(0, 0, -8);
   scene.add(bgMesh);
  
@@ -354,6 +354,14 @@ document.head.appendChild(arrowButtonStyle);
 
   // Update
   // ------
+  const hoveringAmplitudeX = 0.03; // Adjust this value to control the X-axis hovering amplitude
+  const hoveringAmplitudeY = 0.03; // Adjust this value to control the Y-axis hovering amplitude
+  const hoveringAmplitudeZ = 0.03; // Adjust this value to control the Z-axis hovering amplitude
+  const hoveringSpeedX = 0.5; // Adjust this value to control the X-axis hovering speed
+  const hoveringSpeedY = 0.5; // Adjust this value to control the Y-axis hovering speed
+  const hoveringSpeedZ = 0.5; // Adjust this value to control the Z-axis hovering speed
+  const rotationSpeed = 0.02; 
+
   const hoveringAmplitude = 0.05; // Adjust this value to control the hovering amplitude
   const hoveringSpeed = 0.5;
   const attractionStrength = 0.5; // Adjust this value to control the strength of attraction
@@ -371,9 +379,22 @@ document.head.appendChild(arrowButtonStyle);
 
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
-    const hoveringOffset = Math.sin(time * hoveringSpeed) * hoveringAmplitude;
-    const cubePosition = initialCubePosition.clone().add(new THREE.Vector3(0, hoveringOffset, 0));
-    meshes[0].position.copy(cubePosition);
+    const hoveringOffsetX = Math.sin(time * hoveringSpeedX) * hoveringAmplitudeX;
+  const hoveringOffsetY = Math.sin(time * hoveringSpeedY) * hoveringAmplitudeY;
+  const hoveringOffsetZ = Math.sin(time * hoveringSpeedZ) * hoveringAmplitudeZ;
+
+  const rotationOffset = time * rotationSpeed;
+
+  // Apply hovering offsets to all three axes and add rotation effect
+  const cubePosition = initialCubePosition.clone().add(
+    new THREE.Vector3(hoveringOffsetX, hoveringOffsetY, hoveringOffsetZ)
+  );
+
+  cubePosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), rotationOffset);
+  cubePosition.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationOffset);
+  cubePosition.applyAxisAngle(new THREE.Vector3(0, 0, 1), rotationOffset);
+
+  meshes[0].position.copy(cubePosition);
 
     const intersects = raycaster.intersectObjects([bgMesh]); // Only check intersection with the background plane
     if (intersects.length > 0) {
