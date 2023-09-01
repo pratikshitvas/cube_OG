@@ -98,7 +98,7 @@ const sketch = ({ context, canvas }) => {
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
     const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
-    const targetRotationZ = Math.PI * 0.1; // Target X-axis rotation
+    const targetRotationX = Math.PI * 0.1; // Target X-axis rotation
   
     function animate() {
       const currentTime = Date.now();
@@ -110,12 +110,12 @@ const sketch = ({ context, canvas }) => {
   
       const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
       const rotationY = progress * Math.PI * 1;
-      const rotationZ = THREE.MathUtils.lerp(startRotationX, targetRotationZ, easedProgress); // Update X-axis rotation
+      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, easedProgress); // Update X-axis rotation
   
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotationY;
-        mesh.rotation.z = rotationZ; // Apply X-axis rotation
+        mesh.rotation.x = rotationX; // Apply X-axis rotation
       });
       bgMesh.scale.set(scale, scale, 0);
   
