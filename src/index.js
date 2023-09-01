@@ -48,7 +48,7 @@ const sketch = ({ context, canvas }) => {
   renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0.7, 2.70);
+  camera.position.set(0, 0, 2.70);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -78,7 +78,7 @@ const sketch = ({ context, canvas }) => {
   const bgGeometry = new THREE.PlaneGeometry(5, 5);
   const bgMaterial = new THREE.MeshBasicMaterial({ map: videoTexture });
   const bgMesh = new THREE.Mesh(bgGeometry, bgMaterial);
-  bgMesh.position.set(0, -3, -10);
+  bgMesh.position.set(0, 0, -10);
   // bgMesh.position.set(0, 0, -8);
   scene.add(bgMesh);
  
@@ -252,23 +252,30 @@ document.head.appendChild(arrowButtonStyle);
     animate();
   }
 
+//background change
+const imageUrls = [
+  "assets/download (1).jpeg",
+  "assets/download (2).jpeg",
+  "assets/download (3).jpeg",
+  "assets/download (4).jpeg",
+  "assets/download (5).jpeg",
+  "assets/download.jpeg"
+]
+let currentBackgroundIndex = 0;
 
-  const leftButton = createArrowButton("←", -3, 3);
-  const rightButton = createArrowButton("→", 3, -3);
+const leftButton = createArrowButton("←", -3, 3, true);
+const rightButton = createArrowButton("→", 3, -3, false);
 
   const buttonContainer = document.createElement("div");
-  buttonContainer.style.position = "absolute";
-  buttonContainer.style.top = "50%";
-  buttonContainer.style.transform = "translateY(-50%)";
-  buttonContainer.style.left = "20px";
   buttonContainer.style.display = "flex";
   buttonContainer.style.flexDirection = "column";
   buttonContainer.style.alignItems = "center";
+  
   buttonContainer.appendChild(leftButton);
   buttonContainer.appendChild(rightButton);
   document.body.appendChild(buttonContainer);
 
-  function createArrowButton(text, rotationAmount, zoomAmount) {
+  function createArrowButton(text, rotationAmount, zoomAmount, isLeft) {
     const button = document.createElement("button");
     button.className = "arrow-button";
     button.textContent = text;
@@ -278,14 +285,41 @@ document.head.appendChild(arrowButtonStyle);
     button.style.border = "none";
     button.style.background = "rgba(255, 255, 255, 0.5)";
     button.style.cursor = "pointer";
+    
+    if (isLeft) {
+      button.style.position = "absolute";
+      button.style.top = "50%";
+      button.style.left = "20px";
+      button.style.transform = "translateY(-50%)";
+    } else {
+      button.style.position = "absolute";
+      button.style.top = "50%";
+      button.style.right = "20px";
+      button.style.transform = "translateY(-50%)";
+    }
+  
     button.addEventListener("click", () => {
       if (!isShrinking && !isExpanding) {
+        // Change the background image when an arrow button is clicked
+        currentBackgroundIndex = (currentBackgroundIndex + 1) % imageUrls.length;
+        const newBackgroundTexture = new THREE.TextureLoader().load(imageUrls[currentBackgroundIndex]);
+        bgMaterial.map = newBackgroundTexture;
+        newBackgroundTexture.minFilter = THREE.LinearFilter;
+        newBackgroundTexture.magFilter = THREE.LinearFilter;
+        newBackgroundTexture.format = THREE.RGBFormat;
+  
+        // Adjust the scale of the bgMesh based on your desired scale factor
+        const scaleFactor = 0; // Adjust as needed
+        bgMesh.scale.set(scaleFactor, scaleFactor, 0);
+  
+        // Adjust the position of the bgMesh to keep it centered
+        bgMesh.position.set(0, 0, -12);
+  
         animateShrink();
       }
     });
-        return button;
+    return button;
   }
-
   function rotateCube(amount) {
     meshes.forEach((mesh) => {
       mesh.rotateY(amount);
