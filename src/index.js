@@ -63,7 +63,7 @@ const sketch = ({ context, canvas }) => {
   // Content
   // -------
   const video = document.createElement("video");
-  video.src = "";
+  video.src = "src/ecloset_video.mp4";
   video.loop = true;
   video.muted = true;
   video.play();
@@ -98,21 +98,24 @@ const sketch = ({ context, canvas }) => {
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
     const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
-    const targetRotationX = Math.PI * 0.1; // Target X-axis rotation
+    const targetRotationZ = Math.PI * 0.1; // Target X-axis rotation
   
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
   
-      const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
+      // Apply easing for smoother animation
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+  
+      const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
       const rotationY = progress * Math.PI * 1;
-      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, progress); // Update X-axis rotation
+      const rotationZ = THREE.MathUtils.lerp(startRotationX, targetRotationZ, easedProgress); // Update X-axis rotation
   
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotationY;
-        mesh.rotation.z = rotationX; // Apply X-axis rotation
+        mesh.rotation.z = rotationZ; // Apply X-axis rotation
       });
       bgMesh.scale.set(scale, scale, 0);
   
@@ -127,44 +130,40 @@ const sketch = ({ context, canvas }) => {
     animate();
   }
   
-
+  function animateExpand() {
+    if (isExpanding) return;
+    isExpanding = true;
   
-function animateExpand() {
-  if (isExpanding) return;
-  isExpanding = true;
-
-  const animationDuration = 1000;
-  const startTime = Date.now();
-  const startScale = meshes[0].scale.x;
-  const targetScale = 5;
-  const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
-  const targetRotationX = Math.PI * 0.5; // Target X-axis rotation
-
-  function animate() {
-    const currentTime = Date.now();
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / animationDuration, 1);
-
-    const scale = THREE.MathUtils.lerp(startScale, targetScale, progress);
-    const rotationY = progress * Math.PI * 1;
-    const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, progress); // Update X-axis rotation
-
-    meshes.forEach((mesh) => {
-      mesh.scale.set(scale, scale, scale);
-      mesh.rotation.y = rotationY;
-      mesh.rotation.z = rotationX; // Apply X-axis rotation
-    });
-    bgMesh.scale.set(scale, scale, 0);
-
-    if (progress < 1) {
-      requestAnimationFrame(animate);
-    } else {
-      isExpanding = false;
+    const animationDuration = 1500;
+    const startTime = Date.now();
+    const startScale = meshes[0].scale.x;
+    const targetScale = 5;
+  
+    function animate() {
+      const currentTime = Date.now();
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / animationDuration, 1);
+  
+      // Apply easing for smoother animation
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+  
+      const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
+  
+      meshes.forEach((mesh) => {
+        mesh.scale.set(scale, scale, scale);
+      });
+      bgMesh.scale.set(scale, scale, 0);
+  
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        isExpanding = false;
+      }
     }
+  
+    animate();
   }
-
-  animate();
-}
+  
   const arrowButtonStyle = document.createElement("style");
 arrowButtonStyle.textContent = `
   .arrow-button {
