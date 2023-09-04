@@ -45,7 +45,7 @@ const sketch = ({ context, canvas }) => {
     context,
     antialias: false
   });
-  renderer.setClearColor(0x000000, 1);
+  renderer.setClearColor(0xffffff, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
   camera.position.set(0, 0, 2.70);
@@ -267,6 +267,7 @@ const leftButton = createArrowButton("←", -3, 3, true);
 const rightButton = createArrowButton("→", 3, -3, false);
 
   const buttonContainer = document.createElement("div");
+
   buttonContainer.style.display = "flex";
   buttonContainer.style.flexDirection = "column";
   buttonContainer.style.alignItems = "center";
@@ -309,23 +310,16 @@ const rightButton = createArrowButton("→", 3, -3, false);
         newBackgroundTexture.format = THREE.RGBFormat;
   
         // Adjust the scale of the bgMesh based on your desired scale factor
-        const scaleFactor = 0; // Adjust as needed
-        bgMesh.scale.set(scaleFactor, scaleFactor, 0);
+        const scaleFactor = 2; // Adjust as needed
+        bgMesh.scale.set(scaleFactor, scaleFactor, 1);
   
         // Adjust the position of the bgMesh to keep it centered
-        bgMesh.position.set(0, 0, -12);
+        bgMesh.position.set(0, -0.5, -8);
   
         animateShrink();
       }
     });
     return button;
-  }
-  function rotateCube(amount) {
-    meshes.forEach((mesh) => {
-      mesh.rotateY(amount);
-      // Scale the mesh on one side
-      mesh.scale.x += amount * 0.1;
-    });
   }
 
   const positions = [[0, 0, 0]];
