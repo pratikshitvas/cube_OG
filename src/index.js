@@ -17,24 +17,30 @@ const { GUI } = require("dat.gui");
 const settings = {
   animate: true,
   context: "webgl",
-  resizeCanvas: false
+  resizeCanvas: false,
 };
+const linkElement = document.createElement("link");
+linkElement.rel = "stylesheet";
+linkElement.type = "text/css";
+linkElement.href = "index.css"; // Replace with the path to your CSS file
 
+// Append the <link> element to the <head> section of the document
+document.head.appendChild(linkElement);
 const sketch = ({ context, canvas }) => {
   const stats = new Stats();
   document.body.appendChild(stats.dom);
   const gui = new GUI();
- 
+
   const options = {
     enableSwoopingCamera: false,
     enableRotation: true,
     transmission: 1,
     thickness: 0.5,
     roughness: 0,
-    envMapIntensity: 0
+    envMapIntensity: 0,
   };
   const mouse = new THREE.Vector2();
-  canvas.addEventListener('mousemove', (event) => {
+  canvas.addEventListener("mousemove", (event) => {
     mouse.x = (event.clientX / canvas.width) * 2 - 1;
     mouse.y = -(event.clientY / canvas.height) * 2 + 1;
   });
@@ -43,12 +49,12 @@ const sketch = ({ context, canvas }) => {
 
   const renderer = new THREE.WebGLRenderer({
     context,
-    antialias: false
+    antialias: false,
   });
-  renderer.setClearColor(0xffffff, 1);
+  renderer.setClearColor(0x000000, 1);
 
   const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
-  camera.position.set(0, 0, 2.70);
+  camera.position.set(0, 0, 2.7);
 
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.enabled = false;
@@ -63,7 +69,7 @@ const sketch = ({ context, canvas }) => {
   // Content
   // -------
   const video = document.createElement("video");
-  video.src = "src/ecloset_video.mp4";
+  video.src = "assets/VIDEO-2023-09-04-15-43-42.mp4";
   video.loop = true;
   video.muted = true;
   video.play();
@@ -81,45 +87,52 @@ const sketch = ({ context, canvas }) => {
   bgMesh.position.set(0, 0, -10);
   // bgMesh.position.set(0, 0, -8);
   scene.add(bgMesh);
- 
+
   let isAnimating = false;
 
   let isShrinking = false;
   let isExpanding = false;
   let isStarted = false;
 
-
   function animateShrink() {
     if (isShrinking) return;
     isShrinking = true;
-  
+
     const animationDuration = 700;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 1;
     const startRotationX = meshes[0].rotation.x; // Initial X-axis rotation
     const targetRotationX = Math.PI * 0.1; // Target X-axis rotation
-  
+
     // z to X for the multi diretion cube rotation
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-  
+
       // Apply easing for smoother animation
       const easedProgress = 1 - Math.pow(1 - progress, 3);
-  
-      const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
+
+      const scale = THREE.MathUtils.lerp(
+        startScale,
+        targetScale,
+        easedProgress
+      );
       const rotationY = progress * Math.PI * 1;
-      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, easedProgress); // Update X-axis rotation
-  
+      const rotationX = THREE.MathUtils.lerp(
+        startRotationX,
+        targetRotationX,
+        easedProgress
+      ); // Update X-axis rotation
+
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotationY;
         mesh.rotation.x = rotationX; // Apply X-axis rotation
       });
       bgMesh.scale.set(scale, scale, 0);
-  
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
@@ -127,66 +140,77 @@ const sketch = ({ context, canvas }) => {
         animateExpand();
       }
     }
-  
+
     animate();
   }
-  
+
   function animateExpand() {
     if (isExpanding) return;
     isExpanding = true;
-  
+
     const animationDuration = 2000;
     const startTime = Date.now();
     const startScale = meshes[0].scale.x;
     const targetScale = 5;
-  
+
     // Keep track of the current rotation state from the last animation
     const startRotationY = meshes[0].rotation.y;
     const startRotationX = meshes[0].rotation.x;
-  
+
     // Calculate the target rotation state for the expansion
     const targetRotationY = startRotationY + Math.PI * 1; // For example, rotate by 90 degrees
     const targetRotationX = startRotationX + Math.PI * 0.1; // Adjust the X-axis rotation as needed
-  
+
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-  
+
       // Apply easing for smoother animation
       const easedProgress = 1 - Math.pow(1 - progress, 3);
-  
-      const scale = THREE.MathUtils.lerp(startScale, targetScale, easedProgress);
-  
+
+      const scale = THREE.MathUtils.lerp(
+        startScale,
+        targetScale,
+        easedProgress
+      );
+
       // Interpolate rotation values for smooth rotation
-      const rotationY = THREE.MathUtils.lerp(startRotationY, targetRotationY, easedProgress);
-      const rotationX = THREE.MathUtils.lerp(startRotationX, targetRotationX, easedProgress);
-  
+      const rotationY = THREE.MathUtils.lerp(
+        startRotationY,
+        targetRotationY,
+        easedProgress
+      );
+      const rotationX = THREE.MathUtils.lerp(
+        startRotationX,
+        targetRotationX,
+        easedProgress
+      );
+
       meshes.forEach((mesh) => {
         mesh.scale.set(scale, scale, scale);
         mesh.rotation.y = rotationY;
         mesh.rotation.x = rotationX; // Apply X-axis rotation
       });
       bgMesh.scale.set(scale, scale, 0);
-  
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
         isExpanding = false;
       }
     }
-  
+
     animate();
   }
-  
-  
+
   const arrowButtonStyle = document.createElement("style");
-arrowButtonStyle.textContent = `
+  arrowButtonStyle.textContent = `
   .arrow-button {
     display: none;
   }
 `;
-document.head.appendChild(arrowButtonStyle);
+  document.head.appendChild(arrowButtonStyle);
   const startButton = createStartButton("Start");
   document.body.appendChild(startButton); // Add the button to the DOM
 
@@ -201,77 +225,134 @@ document.head.appendChild(arrowButtonStyle);
     const button = document.createElement("button");
     button.textContent = text;
     button.style.fontSize = "24px";
-    button.style.padding = "5px 10px";
+    button.style.padding = "15px";
     button.style.margin = "5px";
     button.style.border = "none";
-    button.style.background = "rgba(255, 255, 255, 0.5)";
+    button.style.color = "white";
+    button.style.borderRadius = "10px";
+    button.style.background = "#1e2c53";
     button.style.cursor = "pointer";
     button.style.position = "absolute"; // Position the button absolutely
-    button.style.top = "20px";
-    button.style.left = "120px"; // Adjust the position as needed
+    button.style.bottom = "50px";
+    button.style.alignItems = "center"; // Adjust the position as needed
     button.addEventListener("click", () => {
       if (!isStarted) {
         expandCubeWithSpin();
         toggleArrowButtonsVisibility(true); // Show arrow buttons
         button.style.display = "none"; // Hide the "Start" button after clicking
         isStarted = true;
+        textElement.style.display = "block";
       }
     });
-  
+
     return button;
   }
-  
+
   function expandCubeWithSpin() {
     const initialScale = meshes[0].scale.clone();
     const targetScale = new THREE.Vector3(5, 5, 5); // Adjust as needed
     const rotationAmount = Math.PI / 0.5; // Adjust the rotation amount
     const videoInitialScale = bgMesh.scale.clone();
-    const videoTargetScale = new THREE.Vector3(2,2,1); // Adjust as needed
+    const videoTargetScale = new THREE.Vector3(2, 2, 1); // Adjust as needed
     const animationDuration = 3500; // Duration of animation in milliseconds
-  
+
     const startTime = Date.now();
     const initialRotation = meshes[0].rotation.y;
-  
+
     function animate() {
       const currentTime = Date.now();
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / animationDuration, 1);
-  
+
       const easedProgress = 1 - Math.pow(1 - progress, 3); // Apply easing for smoother animation
-  
+
       meshes[0].scale.lerpVectors(initialScale, targetScale, easedProgress);
       meshes[0].rotation.y = initialRotation + rotationAmount * easedProgress;
-  
-      bgMesh.scale.lerpVectors(videoInitialScale, videoTargetScale, easedProgress);
-  
+
+      bgMesh.scale.lerpVectors(
+        videoInitialScale,
+        videoTargetScale,
+        easedProgress
+      );
+
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
     }
-  
+
     animate();
   }
 
-//background change
-const imageUrls = [
-  "assets/download (1).jpeg",
-  "assets/download (2).jpeg",
-  "assets/download (3).jpeg",
-  "assets/download (4).jpeg",
-  "assets/download (5).jpeg",
-  "assets/download.jpeg"
-]
-let currentBackgroundIndex = 0;
+  //background change
+  const videoUrls = [
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+    "assets/VIDEO-2023-09-04-15-43-42.mp4",
+  ];
+  let currentVideoIndex = 0;
+  const videoTexts = [
+    "Lorem ipsum is placeholder ",
+    "Lorem ipsum is placeholder text commonly",
+    "Lorem ipsum is ",
+    "Lorem ipsum ",
+    "Lorem ipsum is placeholder text ",
+    "Lorem ipsum is placeholder",
+  ];
+  const textContainer = document.createElement("div");
+  textContainer.style.position = "absolute";
+  textContainer.style.bottom = "50px"; // Adjust the vertical position as needed
+  textContainer.style.left = "20px"; // Adjust the horizontal position as needed
+  textContainer.style.color = "white"; // Adjust the text color
+  textContainer.style.fontSize = "18px"; // Adjust the font size
+  textContainer.style.zIndex = "999"; // Ensure the text appears above other content
+  textContainer.style.fontFamily = "Courier";
 
-const leftButton = createArrowButton("←", -3, 3, true);
-const rightButton = createArrowButton("→", 3, -3, false);
+  textContainer.textContent = "Powered by -"; // Initial text content
+
+  const textOGContainer = document.createElement("div");
+  textOGContainer.style.position = "absolute";
+  textOGContainer.style.bottom = "20px"; // Adjust the vertical position as needed
+  textOGContainer.style.left = "50px"; // Adjust the horizontal position as needed
+  textOGContainer.style.color = "white"; // Adjust the text color
+  textOGContainer.style.fontSize = "20px"; // Adjust the font size
+  textOGContainer.style.zIndex = "999"; // Ensure the text appears above other content
+  textOGContainer.style.fontFamily = "Courier";
+  textOGContainer.style.fontWeight = "900";
+  textOGContainer.textContent = "ONE WAY GLORY INDUSTRIES"; // Initial text content
+
+  // Append the text container to the document body
+  document.body.appendChild(textContainer);
+  document.body.appendChild(textOGContainer);
+  // Create an HTML element to display the text
+  const textElement = document.createElement("div");
+  textElement.style.position = "absolute";
+  textElement.style.top = "50%"; // Vertically centered
+  textElement.style.left = "50%"; // Horizontally centered
+  textElement.style.transform = "translate(-50%, -50%)";
+  textElement.style.fontSize = "24px";
+  textElement.style.color = "#fff";
+  textElement.style.fontSize = "44px";
+  textElement.style.backgroundColor = "#1e2c53";
+  textElement.style.fontWeight = "900";
+  textElement.style.fontFamily = "Courier";
+  textElement.style.borderRadius = "10px";
+  textElement.style.display = "none";
+
+  // Initialize with the first video's text
+  document.body.appendChild(textElement);
+
+  const leftButton = createArrowButton("←", -3, 3, true);
+  const rightButton = createArrowButton("→", 3, -3, false);
 
   const buttonContainer = document.createElement("div");
 
   buttonContainer.style.display = "flex";
   buttonContainer.style.flexDirection = "column";
   buttonContainer.style.alignItems = "center";
-  
+
   buttonContainer.appendChild(leftButton);
   buttonContainer.appendChild(rightButton);
   document.body.appendChild(buttonContainer);
@@ -280,13 +361,30 @@ const rightButton = createArrowButton("→", 3, -3, false);
     const button = document.createElement("button");
     button.className = "arrow-button";
     button.textContent = text;
-    button.style.fontSize = "24px";
-    button.style.padding = "5px 10px";
-    button.style.margin = "5px";
+    button.style.fontSize = "50px";
+    button.style.padding="50px";
+    button.style.fontWeight = "1900";
+    button.style.textAlign="center";
     button.style.border = "none";
-    button.style.background = "rgba(255, 255, 255, 0.5)";
+    button.style.background = "none";
+    button.style.color = "white";
     button.style.cursor = "pointer";
+    button.style.transition = "background-color 0.3s ease-in-out"; // Smooth transition
+
+    // Set initial background color to transparent
+    button.style.backgroundColor = "transparent";
     
+    button.addEventListener("mouseenter", () => {
+      button.style.backgroundColor = "rgba(255, 255, 255)"; // Light white background on hover
+      button.style.borderRadius="50%";
+      button.style.color="black"
+    
+    });
+    
+    button.addEventListener("mouseleave", () => {
+      button.style.backgroundColor = "transparent"; // Reset background on mouse leave
+    });
+
     if (isLeft) {
       button.style.position = "absolute";
       button.style.top = "50%";
@@ -298,33 +396,56 @@ const rightButton = createArrowButton("→", 3, -3, false);
       button.style.right = "20px";
       button.style.transform = "translateY(-50%)";
     }
-  
+
     button.addEventListener("click", () => {
       if (!isShrinking && !isExpanding) {
-        // Change the background image when an arrow button is clicked
-        currentBackgroundIndex = (currentBackgroundIndex + 1) % imageUrls.length;
-        const newBackgroundTexture = new THREE.TextureLoader().load(imageUrls[currentBackgroundIndex]);
-        bgMaterial.map = newBackgroundTexture;
-        newBackgroundTexture.minFilter = THREE.LinearFilter;
-        newBackgroundTexture.magFilter = THREE.LinearFilter;
-        newBackgroundTexture.format = THREE.RGBFormat;
-  
+        if (isLeft) {
+          // Go to the previous video
+          currentVideoIndex =
+            (currentVideoIndex - 1 + videoUrls.length) % videoUrls.length;
+        } else {
+          // Go to the next video
+          currentVideoIndex = (currentVideoIndex + 1) % videoUrls.length;
+        }
+
+        // Set the new video source
+        video.src = videoUrls[currentVideoIndex];
+        video.play();
+
+        // Update the video texture
+        const videoTexture = new THREE.VideoTexture(video);
+        videoTexture.minFilter = THREE.LinearFilter;
+        videoTexture.magFilter = THREE.LinearFilter;
+        videoTexture.format = THREE.RGBFormat;
+        bgMaterial.map = videoTexture;
+
         // Adjust the scale of the bgMesh based on your desired scale factor
         const scaleFactor = 2; // Adjust as needed
         bgMesh.scale.set(scaleFactor, scaleFactor, 1);
-  
+
         // Adjust the position of the bgMesh to keep it centered
         bgMesh.position.set(0, -0.5, -8);
-  
+
         animateShrink();
+
+        // Update the text content and show it
+        textElement.classList.remove("active");
+
+        // Delay the text update and adding the active class to trigger the sliding-in effect
+        setTimeout(() => {
+          textElement.textContent = videoTexts[currentVideoIndex];
+          textElement.classList.add("active");
+          textElement.style.padding = "10px";
+        }, 250);
       }
     });
+
     return button;
   }
 
   const positions = [[0, 0, 0]];
 
-  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.1 )];
+  const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.1)];
 
   const hdrEquirect = new THREE.RGBELoader().load(
     "src/empty_warehouse_01_2k.hdr",
@@ -337,48 +458,24 @@ const rightButton = createArrowButton("→", 3, -3, false);
     transmission: options.transmission,
     thickness: options.thickness,
     roughness: options.roughness,
-    envMap: hdrEquirect
+    envMap: hdrEquirect,
   });
 
-  const meshes = geometries.map((geometry) => new THREE.Mesh(geometry, material));
+  const meshes = geometries.map(
+    (geometry) => new THREE.Mesh(geometry, material)
+  );
 
   meshes.forEach((mesh, i) => {
     scene.add(mesh);
     mesh.position.set(...positions[i]);
   });
 
-  
   // Add dragon GLTF model
 
   // Discard the model
 
   // GUI
   // ---
-
-  gui.add(options, "enableSwoopingCamera").onChange((val) => {
-    controls.enabled = !val;
-    controls.reset();
-  });
-
-  gui.add(options, "enableRotation").onChange(() => {
-    meshes.forEach((mesh) => mesh.rotation.set(0, 0, 0));
-  });
-
-  gui.add(options, "transmission", 0, 1, 0.01).onChange((val) => {
-    material.transmission = val;
-  });
-
-  gui.add(options, "thickness", 0, 5, 0.1).onChange((val) => {
-    material.thickness = val;
-  });
-
-  gui.add(options, "roughness", 0, 1, 0.01).onChange((val) => {
-    material.roughness = val;
-  });
-
-  gui.add(options, "envMapIntensity", 0, 3, 0.1).onChange((val) => {
-    material.envMapIntensity = val;
-  });
 
   // Update
   // ------
@@ -388,7 +485,7 @@ const rightButton = createArrowButton("→", 3, -3, false);
   const hoveringSpeedX = 0.5; // Adjust this value to control the X-axis hovering speed
   const hoveringSpeedY = 0.5; // Adjust this value to control the Y-axis hovering speed
   const hoveringSpeedZ = 0.5; // Adjust this value to control the Z-axis hovering speed
-  const rotationSpeed = 0.02; 
+  const rotationSpeed = 0.02;
 
   const hoveringAmplitude = 0.05; // Adjust this value to control the hovering amplitude
   const hoveringSpeed = 0.5;
@@ -396,7 +493,7 @@ const rightButton = createArrowButton("→", 3, -3, false);
   const hoveringDistance = 0.2; // Adjust this value to control the hovering distance
   const initialCubePosition = new THREE.Vector3(0, 0, 0); // Set your desired original position
   let isAttracted = false;
-  
+
   const update = (time, deltaTime) => {
     const ROTATE_TIME = 10; // Time in seconds for a full rotation
     const xAxis = new THREE.Vector3(1, 0, 0);
@@ -404,25 +501,29 @@ const rightButton = createArrowButton("→", 3, -3, false);
     const rotateX = (deltaTime / ROTATE_TIME) * Math.PI * 2;
     const rotateY = (deltaTime / ROTATE_TIME) * Math.PI * 2;
 
-
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(mouse, camera);
-    const hoveringOffsetX = Math.sin(time * hoveringSpeedX) * hoveringAmplitudeX;
-  const hoveringOffsetY = Math.sin(time * hoveringSpeedY) * hoveringAmplitudeY;
-  const hoveringOffsetZ = Math.sin(time * hoveringSpeedZ) * hoveringAmplitudeZ;
+    const hoveringOffsetX =
+      Math.sin(time * hoveringSpeedX) * hoveringAmplitudeX;
+    const hoveringOffsetY =
+      Math.sin(time * hoveringSpeedY) * hoveringAmplitudeY;
+    const hoveringOffsetZ =
+      Math.sin(time * hoveringSpeedZ) * hoveringAmplitudeZ;
 
-  const rotationOffset = time * rotationSpeed;
+    const rotationOffset = time * rotationSpeed;
 
-  // Apply hovering offsets to all three axes and add rotation effect
-  const cubePosition = initialCubePosition.clone().add(
-    new THREE.Vector3(hoveringOffsetX, hoveringOffsetY, hoveringOffsetZ)
-  );
+    // Apply hovering offsets to all three axes and add rotation effect
+    const cubePosition = initialCubePosition
+      .clone()
+      .add(
+        new THREE.Vector3(hoveringOffsetX, hoveringOffsetY, hoveringOffsetZ)
+      );
 
-  cubePosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), rotationOffset);
-  cubePosition.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationOffset);
-  cubePosition.applyAxisAngle(new THREE.Vector3(0, 0, 1), rotationOffset);
+    cubePosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), rotationOffset);
+    cubePosition.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationOffset);
+    cubePosition.applyAxisAngle(new THREE.Vector3(0, 0, 1), rotationOffset);
 
-  meshes[0].position.copy(cubePosition);
+    meshes[0].position.copy(cubePosition);
 
     const intersects = raycaster.intersectObjects([bgMesh]); // Only check intersection with the background plane
     if (intersects.length > 0) {
@@ -475,7 +576,7 @@ const rightButton = createArrowButton("→", 3, -3, false);
       renderer.dispose();
       gui.destroy();
       document.body.removeChild(stats.dom);
-    }
+    },
   };
 };
 

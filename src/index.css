@@ -1,0 +1,11 @@
+.slide-in-text {
+    position: absolute;
+    top: 50%;
+    left: 0; /* Start from the left edge of the screen */
+    transform: translateX(-100%); /* Initial position (off-screen to the left) */
+    transition: transform 0.5s ease-in-out; /* Adjust duration and easing as needed */
+  }
+  
+  .slide-in-text.active {
+    transform: translateX(0); /* Final position (centered) */
+  }
