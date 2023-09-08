@@ -357,14 +357,53 @@ const sketch = ({ context, canvas }) => {
   buttonContainer.appendChild(rightButton);
   document.body.appendChild(buttonContainer);
 
+  const bottomCenterButton = document.createElement("button");
+  bottomCenterButton.textContent = "Explore More";
+  bottomCenterButton.style.position = "absolute";
+  bottomCenterButton.style.bottom = "20px";
+  bottomCenterButton.style.left = "50%";
+  bottomCenterButton.style.transform = "translateX(-50%)";
+  bottomCenterButton.style.fontSize = "24px";
+  bottomCenterButton.style.padding = "20px 50px 50px 50px";
+  bottomCenterButton.style.border = "none";
+  bottomCenterButton.style.background = "none";
+  bottomCenterButton.style.color='white';
+  bottomCenterButton.style.fontWeight="900";
+  bottomCenterButton.style.fontFamily="Courier"
+  bottomCenterButton.style.cursor = "pointer";
+  bottomCenterButton.style.display = "none";
+  
+  bottomCenterButton.style.transition = "background-color 0.3s ease-in-out"; // Smooth transition
+
+    // Set initial background color to transparent
+    bottomCenterButton.style.backgroundColor = "transparent";
+
+  bottomCenterButton.addEventListener("mouseenter", () => {
+    bottomCenterButton.style.backgroundColor = "#1e2c53"; // Light white background on hover
+    bottomCenterButton.style.borderRadius = "50px 50px 0px 0px";
+
+  });
+
+  bottomCenterButton.addEventListener("mouseleave", () => {
+    bottomCenterButton.style.backgroundColor = "transparent";
+    bottomCenterButton.style.color = "white"; // Reset background on mouse leave
+  });
+
+  document.body.appendChild(bottomCenterButton)
+  startButton.addEventListener("click", () => {
+    // Show the bottom center button
+    bottomCenterButton.style.display = "block";
+    // Add any additional actions you want to perform when the start button is clicked
+  });
+
   function createArrowButton(text, rotationAmount, zoomAmount, isLeft) {
     const button = document.createElement("button");
     button.className = "arrow-button";
     button.textContent = text;
     button.style.fontSize = "50px";
-    button.style.padding="50px";
+    button.style.padding = "50px";
     button.style.fontWeight = "1900";
-    button.style.textAlign="center";
+    button.style.textAlign = "center";
     button.style.border = "none";
     button.style.background = "none";
     button.style.color = "white";
@@ -373,14 +412,13 @@ const sketch = ({ context, canvas }) => {
 
     // Set initial background color to transparent
     button.style.backgroundColor = "transparent";
-    
+
     button.addEventListener("mouseenter", () => {
       button.style.backgroundColor = "rgba(255, 255, 255)"; // Light white background on hover
-      button.style.borderRadius="50%";
-      button.style.color="black"
-    
+      button.style.borderRadius = "50%";
+      button.style.color = "black";
     });
-    
+
     button.addEventListener("mouseleave", () => {
       button.style.backgroundColor = "transparent"; // Reset background on mouse leave
     });
@@ -424,7 +462,7 @@ const sketch = ({ context, canvas }) => {
         bgMesh.scale.set(scaleFactor, scaleFactor, 1);
 
         // Adjust the position of the bgMesh to keep it centered
-        bgMesh.position.set(0, -0.5, -8);
+        bgMesh.position.set(0, -0.1, -9);
 
         animateShrink();
 
