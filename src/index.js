@@ -481,6 +481,106 @@ const sketch = ({ context, canvas }) => {
     return button;
   }
 
+// ... (previous code)
+
+let isCubeSpinActive = false; // Track if the cube spin effect is active
+
+// Function to shrink the cube
+// Function to shrink the cube with spin effect
+function shrinkCube() {
+  const initialScale = meshes[0].scale.clone();
+  const targetShrinkScale = new THREE.Vector3(1, 1, 1); // Adjust as needed
+  const animationDuration = 2500; // Duration of the shrinking animation in milliseconds
+  const rotationAmount = Math.PI * 2; // Amount to rotate during the animation
+
+  const startTime = Date.now();
+  textElement.style.display = 'none';
+
+  function animateShrink() {
+    const currentTime = Date.now();
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / animationDuration, 1);
+
+    const easedProgress = 1 - Math.pow(1 - progress, 3); // Apply easing for smoother animation
+
+    // Calculate the scale for the shrinking animation
+    const scale = new THREE.Vector3().lerpVectors(
+      initialScale,
+      targetShrinkScale,
+      easedProgress
+    );
+
+    // Calculate the rotation for the spin effect
+    const rotation = progress * rotationAmount;
+
+    meshes[0].scale.copy(scale);
+    meshes[0].rotation.x = rotation; // Apply rotation
+
+    // Adjust the background mesh size based on the scale
+    bgMesh.scale.copy(scale);
+
+    if (progress < 1) {
+      requestAnimationFrame(animateShrink);
+    } else {
+      expandCube(); // Call the expandCube function when the shrinking animation is complete
+    }
+  }
+
+  animateShrink();
+}
+
+// Function to expand the cube back to its original state with spin effect
+function expandCube() {
+  const targetExpandScale = new THREE.Vector3(5, 5, 5); // Original scale of the cube
+  const animationDuration = 2000; // Duration of the expanding animation in milliseconds
+  const rotationAmount = Math.PI * 2; // Amount to rotate during the animation
+
+  const startTime = Date.now();
+
+  function animateExpand() {
+    const currentTime = Date.now();
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / animationDuration, 1);
+
+    const easedProgress = 1 - Math.pow(1 - progress, 2); // Apply easing for smoother animation
+
+    // Calculate the scale for the expanding animation
+    const scale = new THREE.Vector3().lerpVectors(
+      meshes[0].scale,
+      targetExpandScale,
+      easedProgress
+    );
+
+    // Calculate the rotation for the spin effect
+    const rotation = progress * rotationAmount;
+
+    meshes[0].scale.copy(scale);
+    meshes[0].rotation.x = rotation; // Apply rotation
+
+    // Adjust the background mesh size based on the scale
+    bgMesh.scale.copy(scale);
+
+    if (progress < 1) {
+      requestAnimationFrame(animateExpand);
+    }
+  }
+
+  animateExpand();
+}
+
+// Event listener for the bottom center button click
+bottomCenterButton.addEventListener("click", () => {
+  shrinkCube(); // Start the shrinking animation on button click
+});
+
+
+
+
+
+
+// ... (rest of your code)
+
+
   const positions = [[0, 0, 0]];
 
   const geometries = [new THREE.RoundedBoxGeometry(1.12, 1.12, 1.12, 16, 0.1)];
